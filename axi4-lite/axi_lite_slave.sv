@@ -1,8 +1,6 @@
 import axi_lite_pkg::*;
 
 module axi_lite_slave (
-  input logic aclk,
-  input logic areset_n,
   axi_lite_if.slave s_axi_lite
 );
 
@@ -31,13 +29,13 @@ assign s_axi_lite.bvalid = (state == WRESP) ? 1 : 0;
 assign s_axi_lite.bresp  = RESP_OKAY;
 
 
-always_ff @(posedge aclk) begin
+always_ff @(s_axi_lite.slave_cb) begin
   if (~areset_n) begin
     addr <= 0;
   end else begin
     case (state)
-      RADDR : addr <= s_axi_lite.araddr;
-      WADDR : addr <= s_axi_lite.awaddr;
+      RADDR   : addr <= s_axi_lite.araddr;
+      WADDR   : addr <= s_axi_lite.awaddr;
       default : addr <= 32'h0;
     endcase
   end
@@ -65,7 +63,7 @@ always_comb begin
   endcase
 end
 
-always_ff @(posedge aclk) begin
+always_ff @(s_axi_lite.slave_cb) begin
   if (~areset_n) begin
     state <= IDLE;
   end else begin
